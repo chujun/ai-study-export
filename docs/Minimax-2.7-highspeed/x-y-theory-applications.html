@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X理论与Y理论 - 各领域典型应用</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===========================================
+           VIEWPORT FITTING: MANDATORY BASE STYLES
+           =========================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        body {
+            height: 100%;
+            overflow-x: hidden;
+            background: #0a0a0f;
+            color: #fff;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: clamp(1.5rem, 5vw, 5rem);
+            position: relative;
+            z-index: 2;
+        }
+
+        :root {
+            --title-size: clamp(2rem, 6vw, 4.5rem);
+            --h2-size: clamp(1.5rem, 4vw, 3rem);
+            --h3-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            --body-size: clamp(0.9rem, 1.8vw, 1.2rem);
+            --small-size: clamp(0.7rem, 1.2vw, 1rem);
+
+            --slide-padding: clamp(1.5rem, 5vw, 5rem);
+            --content-gap: clamp(0.8rem, 2vh, 2rem);
+            --element-gap: clamp(0.3rem, 1vw, 1rem);
+
+            /* X Theory - Red */
+            --x-color: #e74c3c;
+            --x-bg: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            /* Y Theory - Green */
+            --y-color: #2ecc71;
+            --y-bg: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            /* Primary */
+            --primary: #2c3e50;
+            --primary-light: #34495e;
+            --accent: #3498db;
+        }
+
+        /* ===========================================
+           NAVIGATION & UI
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: clamp(1rem, 3vw, 2rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot:hover, .nav-dot.active {
+            background: #fff;
+            transform: scale(1.3);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--y-color);
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: clamp(1rem, 3vw, 2rem);
+            right: clamp(1rem, 3vw, 2rem);
+            font-size: var(--small-size);
+            color: rgba(255,255,255,0.5);
+            z-index: 1000;
+        }
+
+        .keyboard-hint {
+            position: fixed;
+            bottom: clamp(1rem, 3vw, 2rem);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: var(--small-size);
+            color: rgba(255,255,255,0.3);
+            z-index: 1000;
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-size: var(--title-size);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: var(--content-gap);
+        }
+
+        h2 {
+            font-size: var(--h2-size);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: var(--content-gap);
+        }
+
+        h3 {
+            font-size: var(--h3-size);
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        p, li {
+            font-size: var(--body-size);
+            line-height: 1.6;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: rgba(255,255,255,0.7);
+            font-weight: 300;
+        }
+
+        /* ===========================================
+           SLIDE BACKGROUNDS
+           =========================================== */
+        .slide::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.05;
+            background-size: 30px 30px;
+            background-image: radial-gradient(circle, #fff 1px, transparent 1px);
+            z-index: 0;
+        }
+
+        .slide-x {
+            background: linear-gradient(135deg, #1a0a0a 0%, #2a1515 50%, #1a0a0a 100%);
+        }
+
+        .slide-x::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 60%;
+            height: 100%;
+            background: radial-gradient(ellipse, rgba(231,76,60,0.15) 0%, transparent 70%);
+            z-index: 1;
+        }
+
+        .slide-y {
+            background: linear-gradient(135deg, #0a1a0a 0%, #152a15 50%, #0a1a0a 100%);
+        }
+
+        .slide-y::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 60%;
+            height: 100%;
+            background: radial-gradient(ellipse, rgba(46,204,113,0.15) 0%, transparent 70%);
+            z-index: 1;
+        }
+
+        .slide-primary {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+        }
+
+        .slide-primary::after {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 60%;
+            background: radial-gradient(ellipse, rgba(52,152,219,0.1) 0%, transparent 70%);
+            z-index: 1;
+        }
+
+        .slide-cover {
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
+        }
+
+        /* ===========================================
+           DECORATIVE ELEMENTS
+           =========================================== */
+        .deco-circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+
+        .deco-circle-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -100px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .deco-circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            left: -50px;
+            animation: float 6s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.3em 0.8em;
+            border-radius: 4px;
+            font-size: var(--small-size);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .tag-x {
+            background: var(--x-bg);
+            color: #fff;
+        }
+
+        .tag-y {
+            background: var(--y-bg);
+            color: #fff;
+        }
+
+        /* ===========================================
+           CARDS & CONTAINERS
+           =========================================== */
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: clamp(1rem, 3vw, 2rem);
+            backdrop-filter: blur(10px);
+            max-width: min(90vw, 1000px);
+        }
+
+        .card-x {
+            border-color: rgba(231,76,60,0.3);
+            box-shadow: 0 0 30px rgba(231,76,60,0.1);
+        }
+
+        .card-y {
+            border-color: rgba(46,204,113,0.3);
+            box-shadow: 0 0 30px rgba(46,204,113,0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: clamp(0.8rem, 2vw, 1.5rem);
+            width: 100%;
+            max-width: min(90vw, 1200px);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* ===========================================
+           BULLET LISTS
+           =========================================== */
+        .bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--element-gap);
+            width: 100%;
+            max-width: min(85vw, 900px);
+        }
+
+        .bullet-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8em;
+            padding: 0.5em 0;
+        }
+
+        .bullet-list li::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            min-width: 8px;
+            border-radius: 50%;
+            margin-top: 0.5em;
+        }
+
+        .bullet-x li::before {
+            background: var(--x-color);
+            box-shadow: 0 0 10px var(--x-color);
+        }
+
+        .bullet-y li::before {
+            background: var(--y-color);
+            box-shadow: 0 0 10px var(--y-color);
+        }
+
+        /* ===========================================
+           COMPARISON LAYOUT
+           =========================================== */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1rem, 3vw, 2rem);
+            width: 100%;
+            max-width: min(95vw, 1400px);
+        }
+
+        .comparison-col {
+            padding: clamp(1rem, 3vw, 2rem);
+            border-radius: 16px;
+        }
+
+        .comparison-col-x {
+            background: rgba(231,76,60,0.1);
+            border: 1px solid rgba(231,76,60,0.3);
+        }
+
+        .comparison-col-y {
+            background: rgba(46,204,113,0.1);
+            border: 1px solid rgba(46,204,113,0.3);
+        }
+
+        .comparison-title {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            font-weight: 700;
+            margin-bottom: 1em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .comparison-title-x {
+            color: var(--x-color);
+        }
+
+        .comparison-title-y {
+            color: var(--y-color);
+        }
+
+        /* ===========================================
+           PYRAMID DIAGRAM
+           =========================================== */
+        .pyramid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .pyramid-level {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(0.8rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem);
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .pyramid-level:hover {
+            transform: scale(1.05);
+        }
+
+        .pyramid-top {
+            width: 50%;
+            background: var(--y-bg);
+            color: #fff;
+        }
+
+        .pyramid-mid {
+            width: 75%;
+            background: var(--primary-light);
+            color: #fff;
+        }
+
+        .pyramid-base {
+            width: 100%;
+            background: var(--x-bg);
+            color: #fff;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+            .deco-circle {
+                animation: none !important;
+            }
+        }
+
+        /* ===========================================
+           RESPONSIVE ADJUSTMENTS
+           =========================================== */
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .nav-dots {
+                right: 0.5rem;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .deco-circle {
+                display: none;
+            }
+            .slide-content {
+                padding-top: 2rem;
+                padding-bottom: 3rem;
+            }
+        }
+
+        /* ===========================================
+           SPECIAL SECTIONS
+           =========================================== */
+        .section-num {
+            position: absolute;
+            top: clamp(1rem, 3vw, 2rem);
+            left: clamp(1rem, 3vw, 2rem);
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            opacity: 0.1;
+            line-height: 1;
+        }
+
+        .big-x, .big-y {
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 900;
+            line-height: 1;
+            position: absolute;
+            opacity: 0.05;
+            pointer-events: none;
+        }
+
+        .big-x {
+            color: var(--x-color);
+            top: 10%;
+            right: 5%;
+        }
+
+        .big-y {
+            color: var(--y-color);
+            bottom: 10%;
+            left: 5%;
+        }
+
+        .quote {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            font-style: italic;
+            opacity: 0.9;
+            max-width: 800px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .quote-author {
+            margin-top: 1em;
+            font-size: var(--body-size);
+            opacity: 0.6;
+            font-style: normal;
+        }
+
+        /* ===========================================
+           TABLE STYLES
+           =========================================== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--body-size);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: clamp(0.5rem, 1.5vw, 1rem);
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .data-table th {
+            font-weight: 600;
+            color: var(--y-color);
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255,255,255,0.03);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation Dots -->
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- Slide Counter -->
+    <div class="slide-counter" id="slideCounter">1 / 20</div>
+
+    <!-- Keyboard Hint -->
+    <div class="keyboard-hint">按空格键或滚轮翻页</div>
+
+    <!-- ===========================================
+         SLIDE 1: COVER
+         =========================================== -->
+    <section class="slide slide-cover" id="slide-1">
+        <div class="deco-circle deco-circle-1"></div>
+        <div class="deco-circle deco-circle-2"></div>
+        <div class="big-x">X</div>
+        <div class="big-y">Y</div>
+        <div class="slide-content">
+            <h1 class="reveal">X理论与Y理论</h1>
+            <p class="subtitle reveal reveal-delay-1">在各个领域的典型应用</p>
+            <div class="reveal reveal-delay-2" style="margin-top: 2em; display: flex; gap: 1em;">
+                <span class="tag tag-x">X = External</span>
+                <span class="tag tag-y">Y = Your Drive</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 2: OVERVIEW
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-2">
+        <div class="section-num">01</div>
+        <div class="slide-content">
+            <h2 class="reveal">理论起源</h2>
+            <p class="reveal reveal-delay-1" style="max-width: 700px; text-align: center; opacity: 0.8;">
+                道格拉斯·麦格雷戈（Douglas McGregor）在《企业的人性面》（1960年）中提出两套对立的人性假设
+            </p>
+            <div class="comparison" style="margin-top: 2em;">
+                <div class="comparison-col comparison-col-x reveal reveal-delay-2">
+                    <div class="comparison-title comparison-title-x">
+                        <span>X</span> 理论
+                    </div>
+                    <ul class="bullet-list bullet-x">
+                        <li>人天生厌恶工作</li>
+                        <li>必须用奖惩控制</li>
+                        <li>逃避责任</li>
+                    </ul>
+                </div>
+                <div class="comparison-col comparison-col-y reveal reveal-delay-3">
+                    <div class="comparison-title comparison-title-y">
+                        <span>Y</span> 理论
+                    </div>
+                    <ul class="bullet-list bullet-y">
+                        <li>工作是自然需要</li>
+                        <li>有自我导向能力</li>
+                        <li>内在动机更重要</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 3: MEMORY TIP
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-3">
+        <div class="section-num">02</div>
+        <div class="slide-content">
+            <h2 class="reveal">记忆技巧</h2>
+            <div class="comparison" style="margin-top: 1.5em;">
+                <div class="comparison-col comparison-col-x reveal reveal-delay-1">
+                    <div class="comparison-title comparison-title-x">X = eXternal</div>
+                    <p style="opacity: 0.8;">外部控制<br>命令 · 监督 · 奖惩</p>
+                </div>
+                <div class="comparison-col comparison-col-y reveal reveal-delay-2">
+                    <div class="comparison-title comparison-title-y">Y = Your inner drive</div>
+                    <p style="opacity: 0.8;">你的内在驱动<br>授权 · 信任 · 成长</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 4: ANCIENT CHINA X
+         =========================================== -->
+    <section class="slide slide-x" id="slide-4">
+        <div class="section-num">03</div>
+        <div class="big-x">X</div>
+        <div class="slide-content">
+            <span class="tag tag-x reveal">古代中国</span>
+            <h2 class="reveal reveal-delay-1" style="color: var(--x-color);">商鞅变法与秦帝国</h2>
+            <div class="card card-x reveal reveal-delay-2" style="max-width: 800px;">
+                <h3 style="margin-bottom: 1em;">首级计功制度</h3>
+                <table class="data-table">
+                    <tr><th>斩首</th><th>授爵</th><th>赐田</th></tr>
+                    <tr><td>甲士一人</td><td>爵一级</td><td>一顷 + 宅一处</td></tr>
+                    <tr><td>二级</td><td>上造</td><td>免除徭役</td></tr>
+                    <tr><td>五级以上</td><td>大夫</td><td>赐隶臣妾</td></tr>
+                </table>
+            </div>
+            <p class="reveal reveal-delay-3" style="margin-top: 1.5em; opacity: 0.7; max-width: 600px;">
+                大棒：连坐法 · 轻罪重刑 · 弃灰于道者黥
+            </p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 5: ANCIENT CHINA Y
+         =========================================== -->
+    <section class="slide slide-y" id="slide-5">
+        <div class="section-num">04</div>
+        <div class="big-y">Y</div>
+        <div class="slide-content">
+            <span class="tag tag-y reveal">古代中国</span>
+            <h2 class="reveal reveal-delay-1" style="color: var(--y-color);">道家与儒家</h2>
+            <div class="grid grid-2" style="margin-top: 1.5em; max-width: 900px;">
+                <div class="card card-y reveal reveal-delay-2">
+                    <h3 style="color: var(--y-color);">庄子 · 道家</h3>
+                    <p style="opacity: 0.8; margin-top: 0.5em;">"若夫乘天地之正，而御六气之辩，以游无穷者，彼且恶乎待哉？"</p>
+                    <ul class="bullet-list bullet-y" style="margin-top: 1em;">
+                        <li>追求精神自由</li>
+                        <li>陶渊明：不为五斗米折腰</li>
+                        <li>李白：安能摧眉折腰事权贵</li>
+                    </ul>
+                </div>
+                <div class="card card-y reveal reveal-delay-3">
+                    <h3 style="color: var(--y-color);">王阳明 · 儒家</h3>
+                    <p style="opacity: 0.8; margin-top: 0.5em;">"圣人之道，吾性自足，向之求理于事物者误也。"</p>
+                    <ul class="bullet-list bullet-y" style="margin-top: 1em;">
+                        <li>致良知：听从内心</li>
+                        <li>知行合一</li>
+                        <li>海瑞：明知必死仍上疏</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 6: RUIFA
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-6">
+        <div class="section-num">05</div>
+        <div class="slide-content">
+            <h2 class="reveal">外儒内法：复合激励体系</h2>
+            <div class="pyramid reveal reveal-delay-1" style="margin-top: 1.5em;">
+                <div class="pyramid-level pyramid-top">表层（儒家）→ Y理论</div>
+                <div class="pyramid-level pyramid-mid">中层（霸王道杂之）</div>
+                <div class="pyramid-level pyramid-base">深层（法家）→ X理论</div>
+            </div>
+            <p class="quote reveal reveal-delay-2" style="margin-top: 2em;">
+                "汉家自有制度，本以霸王道杂之。"
+                <span class="quote-author">—— 汉宣帝</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 7: ANCIENT WEST X
+         =========================================== -->
+    <section class="slide slide-x" id="slide-7">
+        <div class="section-num">06</div>
+        <div class="big-x">X</div>
+        <div class="slide-content">
+            <span class="tag tag-x reveal">古代西方</span>
+            <h2 class="reveal reveal-delay-1" style="color: var(--x-color);">斯巴达军事共同体</h2>
+            <div class="card card-x reveal reveal-delay-2" style="max-width: 700px;">
+                <ul class="bullet-list bullet-x">
+                    <li><strong>7岁</strong>：离开家庭公共抚养，冬赤脚夏薄衣</li>
+                    <li><strong>12岁</strong>：偷窃食物训练，被发现者挨打</li>
+                    <li><strong>18岁</strong>：杀人训练（希洛人），鼓励刺杀</li>
+                    <li><strong>希洛人</strong>：永久的大棒，夜间刺杀、鞭笞仪式</li>
+                </ul>
+            </div>
+            <p class="reveal reveal-delay-3" style="margin-top: 1.5em; opacity: 0.7;">
+                军事优势持续约200年 · 公元前371年留克特拉战役败于底比斯后衰落
+            </p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 8: ANCIENT WEST Y
+         =========================================== -->
+    <section class="slide slide-y" id="slide-8">
+        <div class="section-num">07</div>
+        <div class="big-y">Y</div>
+        <div class="slide-content">
+            <span class="tag tag-y reveal">古代西方</span>
+            <h2 class="reveal reveal-delay-1" style="color: var(--y-color);">苏格拉底与斯多葛学派</h2>
+            <div class="grid" style="margin-top: 1.5em; max-width: 900px;">
+                <div class="card card-y reveal reveal-delay-2">
+                    <h3 style="color: var(--y-color);">苏格拉底</h3>
+                    <p class="quote" style="font-size: 1rem; text-align: left; margin-top: 0.5em;">"无人有意作恶。"</p>
+                    <p style="opacity: 0.7; margin-top: 0.5em; font-size: 0.9em;">教育是唤醒内在认知，而非强制灌输</p>
+                </div>
+                <div class="card card-y reveal reveal-delay-3">
+                    <h3 style="color: var(--y-color);">第欧根尼</h3>
+                    <p class="quote" style="font-size: 1rem; text-align: left; margin-top: 0.5em;">"希望你闪开，别挡住我的阳光。"</p>
+                    <p style="opacity: 0.7; margin-top: 0.5em; font-size: 0.9em;">彻底拒绝外在激励，追求精神自由</p>
+                </div>
+                <div class="card card-y reveal reveal-delay-4">
+                    <h3 style="color: var(--y-color);">马可·奥勒留</h3>
+                    <p class="quote" style="font-size: 1rem; text-align: left; margin-top: 0.5em;">"今天我逃离了一切痛苦，是因为我的内心。"</p>
+                    <p style="opacity: 0.7; margin-top: 0.5em; font-size: 0.9em;">罗马皇帝，坚持每日冥想自省</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 9: MODERN WEST X
+         =========================================== -->
+    <section class="slide slide-x" id="slide-9">
+        <div class="section-num">08</div>
+        <div class="big-x">X</div>
+        <div class="slide-content">
+            <span class="tag tag-x reveal">现代西方</span>
+            <h2 class="reveal reveal-delay-1" style="color: var(--x-color);">泰勒制与亚马逊</h2>
+            <div class="comparison reveal reveal-delay-2" style="margin-top: 1em;">
+                <div class="comparison-col comparison-col-x">
+                    <div class="comparison-title comparison-title-x">泰勒科学管理</div>
+                    <ul class="bullet-list bullet-x" style="font-size: 0.9em;">
+                        <li>动作研究、时间研究</li>
+                        <li>差异化计件工资</li>
+                        <li>职能工长制</li>
+                        <li>福特：装配12.5小时→93分钟</li>
+                    </ul>
+                </div>
+                <div class="comparison-col comparison-col-x">
+                    <div class="comparison-title comparison-title-x">亚马逊争议</div>
+                    <ul class="bullet-list bullet-x" style="font-size: 0.9em;">
+                        <li>监控手环，精确到秒</li>
+                        <li>上厕所时间被严格限制</li>
+                        <li>裁员决定由AI自动做出</li>
+                        <li>Bloomberg 2018调查</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 10: MODERN WEST Y
+         =========================================== -->
+    <section class="slide slide-y" id="slide-10">
+        <div class="section-num">09</div>
+        <div class="big-y">Y</div>
+        <div class="slide-content">
+            <span class="tag tag-y reveal">现代西方</span>
+            <h2 class="reveal reveal-delay-1" style="color: var(--y-color);">谷歌与微软</h2>
+            <div class="card card-y reveal reveal-delay-2" style="max-width: 800px;">
+                <h3>亚里士多德项目（2015）</h3>
+                <p style="opacity: 0.8; margin-top: 0.5em;">研究180个团队发现：<strong>心理安全</strong>是高效团队最重要的因素</p>
+                <p class="quote" style="font-size: 1rem; margin-top: 1em;">"团队成员相信不会因提出问题或承认错误而被惩罚。"</p>
+            </div>
+            <div class="grid grid-2 reveal reveal-delay-3" style="margin-top: 1.5em; max-width: 800px;">
+                <div>
+                    <h3 style="font-size: 1em;">谷歌Y理论实践</h3>
+                    <ul class="bullet-list bullet-y" style="font-size: 0.85em;">
+                        <li>20%时间 → Gmail等诞生</li>
+                        <li>弹性工作制</li>
+                        <li>扁平化结构</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="font-size: 1em;">微软纳德拉转型</h3>
+                    <ul class="bullet-list bullet-y" style="font-size: 0.85em;">
+                        <li>市值：3000亿→2.8万亿美元</li>
+                        <li>员工敬业度：46%→91%</li>
+                        <li>成长型思维</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 11: MODERN CHINA
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-11">
+        <div class="section-num">10</div>
+        <div class="slide-content">
+            <h2 class="reveal">现代中国：从X到Y的转型</h2>
+            <div class="comparison reveal reveal-delay-1" style="margin-top: 1.5em;">
+                <div class="comparison-col comparison-col-x">
+                    <div class="comparison-title comparison-title-x">计划经济（极端X）</div>
+                    <ul class="bullet-list bullet-x" style="font-size: 0.85em;">
+                        <li>统包统配、终身就业</li>
+                        <li>政治审查、户籍控制</li>
+                        <li>大跃进激励失败</li>
+                    </ul>
+                </div>
+                <div class="comparison-col comparison-col-y">
+                    <div class="comparison-title comparison-title-y">改革开放（X/Y并存）</div>
+                    <ul class="bullet-list bullet-y" style="font-size: 0.85em;">
+                        <li>包产到户：3亿吨→4亿吨</li>
+                        <li>华为：虚拟股+狼性文化</li>
+                        <li>字节：Context not Control</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 12: TOYOTA
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-12">
+        <div class="section-num">11</div>
+        <div class="slide-content">
+            <h2 class="reveal">丰田模式：X/Y整合典范</h2>
+            <div class="pyramid reveal reveal-delay-1" style="margin-top: 1em;">
+                <div class="pyramid-level pyramid-top">Y理论：持续改善、停线权、看板拉动</div>
+                <div class="pyramid-level pyramid-mid">规范与文化层</div>
+                <div class="pyramid-level pyramid-base">X理论：标准作业、流程控制</div>
+            </div>
+            <div class="card reveal reveal-delay-2" style="max-width: 700px; margin-top: 1.5em;">
+                <p class="quote" style="font-size: 1rem;">"丰田生产方式的最终目标是人字旁的自动化——不是用机器来控制人，而是让人与机器协调，创造最高价值。"</p>
+                <p class="quote-author">—— 大野耐一</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 13: MILITARY
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-13">
+        <div class="section-num">12</div>
+        <div class="slide-content">
+            <h2 class="reveal">军事领域的典型应用</h2>
+            <div class="comparison reveal reveal-delay-1" style="margin-top: 1.5em;">
+                <div class="comparison-col comparison-col-x">
+                    <div class="comparison-title comparison-title-x">X理论军队</div>
+                    <ul class="bullet-list bullet-x" style="font-size: 0.85em;">
+                        <li>秦军：首级计功+连坐法</li>
+                        <li>斯巴达：军事共同体</li>
+                        <li>拿破仑：征俄失败</li>
+                        <li>有效条件：短期、低烈度</li>
+                    </ul>
+                </div>
+                <div class="comparison-col comparison-col-y">
+                    <div class="comparison-title comparison-title-y">Y理论军队</div>
+                    <ul class="bullet-list bullet-y" style="font-size: 0.85em;">
+                        <li>岳家军：冻死不拆屋</li>
+                        <li>志愿军：炒面+雪守43天</li>
+                        <li>以色列：全民兵役</li>
+                        <li>有效条件：长期、高烈度</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="reveal reveal-delay-2" style="margin-top: 1.5em; opacity: 0.8; font-size: 0.9em;">
+                结论：Y理论决定上限，X理论决定下限
+            </p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 14: EDUCATION
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-14">
+        <div class="section-num">13</div>
+        <div class="slide-content">
+            <h2 class="reveal">教育领域的典型应用</h2>
+            <div class="comparison reveal reveal-delay-1" style="margin-top: 1.5em;">
+                <div class="comparison-col comparison-col-x">
+                    <div class="comparison-title comparison-title-x">X理论：应试教育</div>
+                    <ul class="bullet-list bullet-x" style="font-size: 0.85em;">
+                        <li>题海战术：重复强化</li>
+                        <li>排名制度：外部竞争</li>
+                        <li>PISA：中国数学第一</li>
+                        <li>学习幸福感：倒数</li>
+                    </ul>
+                </div>
+                <div class="comparison-col comparison-col-y">
+                    <div class="comparison-title comparison-title-y">Y理论：建构主义</div>
+                    <ul class="bullet-list bullet-y" style="font-size: 0.85em;">
+                        <li>蒙特梭利：儿童自主选择</li>
+                        <li>芬兰：玩耍优先、晚入学</li>
+                        <li>内在满足感驱动</li>
+                        <li>创造力更强</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 15: OTHER DOMAINS
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-15">
+        <div class="section-num">14</div>
+        <div class="slide-content">
+            <h2 class="reveal">更多领域应用</h2>
+            <div class="grid reveal reveal-delay-1" style="margin-top: 1.5em; font-size: 0.85em;">
+                <div class="card" style="border-left: 3px solid var(--x-color);">
+                    <h3 style="color: var(--x-color);">体育</h3>
+                    <p style="opacity: 0.7;">兴奋剂、军事化训练<br><strong style="color: var(--y-color);">vs</strong><br>科比凌晨四点训练</p>
+                </div>
+                <div class="card" style="border-left: 3px solid var(--x-color);">
+                    <h3 style="color: var(--x-color);">宗教</h3>
+                    <p style="opacity: 0.7;">赎罪券、异端裁判所<br><strong style="color: var(--y-color);">vs</strong><br>因信称义、禅宗顿悟</p>
+                </div>
+                <div class="card" style="border-left: 3px solid var(--x-color);">
+                    <h3 style="color: var(--x-color);">政府</h3>
+                    <p style="opacity: 0.7;">法治、惩罚机制<br><strong style="color: var(--y-color);">vs</strong><br>公民责任、志愿服务</p>
+                </div>
+                <div class="card" style="border-left: 3px solid var(--x-color);">
+                    <h3 style="color: var(--x-color);">家庭</h3>
+                    <p style="opacity: 0.7;">体罚、物质奖励<br><strong style="color: var(--y-color);">vs</strong><br>正面管教、无条件接纳</p>
+                </div>
+                <div class="card" style="border-left: 3px solid var(--x-color);">
+                    <h3 style="color: var(--x-color);">创业</h3>
+                    <p style="opacity: 0.7;">对赌协议、淘汰压力<br><strong style="color: var(--y-color);">vs</strong><br>使命驱动、愿景驱动</p>
+                </div>
+                <div class="card" style="border-left: 3px solid var(--x-color);">
+                    <h3 style="color: var(--x-color);">非营利</h3>
+                    <p style="opacity: 0.7;">福利依赖<br><strong style="color: var(--y-color);">vs</strong><br>特蕾莎修女使命感召</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 16: SUMMARY
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-16">
+        <div class="section-num">15</div>
+        <div class="slide-content">
+            <h2 class="reveal">核心启示</h2>
+            <div class="card reveal reveal-delay-1" style="max-width: 800px; margin-top: 1.5em;">
+                <ol style="list-style: none; display: flex; flex-direction: column; gap: 1em;">
+                    <li style="display: flex; align-items: center; gap: 1em;">
+                        <span class="tag tag-x">1</span>
+                        <span><strong>非此即彼是错误的</strong> — 成熟组织需要X/Y动态平衡</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 1em;">
+                        <span class="tag tag-x">2</span>
+                        <span><strong>X理论是必要条件</strong> — 防止混乱、维持秩序</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 1em;">
+                        <span class="tag tag-y">3</span>
+                        <span><strong>Y理论是充分条件</strong> — 激发超越、持续创新</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 1em;">
+                        <span class="tag tag-y">4</span>
+                        <span><strong>情境决定配比</strong> — 初创期Y为主，成熟期X增加</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 1em;">
+                        <span class="tag tag-y">5</span>
+                        <span><strong>Y理论需要前提</strong> — 高素质员工+心理安全文化</span>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 17: BEST PRACTICE
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-17">
+        <div class="section-num">16</div>
+        <div class="slide-content">
+            <h2 class="reveal">最佳实践：混合模式</h2>
+            <div class="pyramid reveal reveal-delay-1" style="margin-top: 1em;">
+                <div class="pyramid-level pyramid-top">顶层：Y理论</div>
+                <div style="text-align: center; opacity: 0.7; font-size: 0.85em; margin: 0.3em 0;">使命愿景 · 成长机会 · 认可表彰</div>
+                <div class="pyramid-level pyramid-mid">中层：X/Y平衡</div>
+                <div style="text-align: center; opacity: 0.7; font-size: 0.85em; margin: 0.3em 0;">规范管理 · 文化凝聚</div>
+                <div class="pyramid-level pyramid-base">底层：X理论</div>
+                <div style="text-align: center; opacity: 0.7; font-size: 0.85em; margin: 0.3em 0;">合理薪酬 · 清晰职责 · 必要纪律</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 18: COMPARISON TABLE
+         =========================================== -->
+    <section class="slide slide-primary" id="slide-18">
+        <div class="section-num">17</div>
+        <div class="slide-content" style="padding-top: 2rem;">
+            <h2 class="reveal" style="font-size: var(--h3-size);">X理论与Y理论对比</h2>
+            <div class="card reveal reveal-delay-1" style="max-width: 95vw; overflow-x: auto; margin-top: 1em;">
+                <table class="data-table" style="font-size: 0.85em; min-width: 600px;">
+                    <tr>
+                        <th>维度</th>
+                        <th style="color: var(--x-color);">X理论</th>
+                        <th style="color: var(--y-color);">Y理论</th>
+                    </tr>
+                    <tr><td>人性假设</td><td>消极（人天生惰性）</td><td>积极（人有潜能）</td></tr>
+                    <tr><td>核心驱动力</td><td>外在奖惩</td><td>内在动机</td></tr>
+                    <tr><td>管理重心</td><td>控制行为</td><td>释放潜能</td></tr>
+                    <tr><td>适用场景</td><td>简单重复劳动</td><td>知识创新工作</td></tr>
+                    <tr><td>领导风格</td><td>命令式</td><td>授权式</td></tr>
+                    <tr><td>监督程度</td><td>严密监控</td><td>高度信任</td></tr>
+                    <tr><td>激励方式</td><td>金钱为主</td><td>认可+成长为主</td></tr>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 19: QUOTE
+         =========================================== -->
+    <section class="slide slide-y" id="slide-19">
+        <div class="big-y">Y</div>
+        <div class="slide-content">
+            <p class="quote reveal">
+                "每一项管理决策背后，<br>都隐含着关于人性的假设——<br>管理者相信人是什么样的，<br>决定了他如何管理。"
+            </p>
+            <p class="quote-author reveal reveal-delay-1" style="margin-top: 2em;">
+                道格拉斯·麦格雷戈<br>
+                <span style="opacity: 0.6;">《企业的人性面》（1960）</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 20: END
+         =========================================== -->
+    <section class="slide slide-cover" id="slide-20">
+        <div class="deco-circle deco-circle-1"></div>
+        <div class="deco-circle deco-circle-2"></div>
+        <div class="big-x">X</div>
+        <div class="big-y">Y</div>
+        <div class="slide-content">
+            <h1 class="reveal">谢谢观看</h1>
+            <p class="subtitle reveal reveal-delay-1">X理论与Y理论 · 在各个领域的典型应用</p>
+            <div class="reveal reveal-delay-2" style="margin-top: 2em; display: flex; gap: 1em;">
+                <span class="tag tag-x">External</span>
+                <span style="opacity: 0.5;">+</span>
+                <span class="tag tag-y">Inner Drive</span>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // ===========================================
+        // PRESENTATION CONTROLLER
+        // ===========================================
+        class PresentationController {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+
+                this.init();
+            }
+
+            init() {
+                this.createNavDots();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupWheelNav();
+                this.setupTouchNav();
+                this.updateProgress();
+                this.revealFirstSlide();
+            }
+
+            createNavDots() {
+                const navContainer = document.getElementById('navDots');
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot';
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    navContainer.appendChild(dot);
+                });
+                this.dots = document.querySelectorAll('.nav-dot');
+            }
+
+            setupIntersectionObserver() {
+                const options = {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: 0.5
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const index = Array.from(this.slides).indexOf(entry.target);
+                            this.currentSlide = index;
+                            this.updateUI();
+                            this.revealSlide(entry.target);
+                        }
+                    });
+                }, options);
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                        e.preventDefault();
+                        this.prevSlide();
+                    } else if (e.key === 'Home') {
+                        e.preventDefault();
+                        this.goToSlide(0);
+                    } else if (e.key === 'End') {
+                        e.preventDefault();
+                        this.goToSlide(this.totalSlides - 1);
+                    }
+                });
+            }
+
+            setupWheelNav() {
+                let isThrottled = false;
+                document.addEventListener('wheel', (e) => {
+                    if (isThrottled) return;
+
+                    isThrottled = true;
+                    setTimeout(() => isThrottled = false, 800);
+
+                    if (e.deltaY > 0) {
+                        this.nextSlide();
+                    } else {
+                        this.prevSlide();
+                    }
+                });
+            }
+
+            setupTouchNav() {
+                let startY = 0;
+                document.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                });
+
+                document.addEventListener('touchend', (e) => {
+                    const endY = e.changedTouches[0].clientY;
+                    const diff = startY - endY;
+
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) {
+                            this.nextSlide();
+                        } else {
+                            this.prevSlide();
+                        }
+                    }
+                });
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) {
+                    this.goToSlide(this.currentSlide + 1);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.goToSlide(this.currentSlide - 1);
+                }
+            }
+
+            goToSlide(index) {
+                this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                this.currentSlide = index;
+                this.updateUI();
+            }
+
+            updateUI() {
+                // Update dots
+                this.dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+
+                // Update counter
+                document.getElementById('slideCounter').textContent =
+                    `${this.currentSlide + 1} / ${this.totalSlides}`;
+
+                // Update progress bar
+                this.updateProgress();
+            }
+
+            updateProgress() {
+                const progress = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+            }
+
+            revealSlide(slide) {
+                const reveals = slide.querySelectorAll('.reveal');
+                reveals.forEach(el => el.classList.add('visible'));
+            }
+
+            revealFirstSlide() {
+                this.revealSlide(this.slides[0]);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            new PresentationController();
+        });
+    </script>
+</body>
+</html>
