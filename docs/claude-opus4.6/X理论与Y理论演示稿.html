@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X理论与Y理论 — 各领域的典型应用</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --dark: #0f1729;
+  --dark2: #1a2340;
+  --mid: #2d3a5e;
+  --accent: #e8523f;
+  --accent-glow: #ff6b54;
+  --green: #2ecc71;
+  --green-dark: #1a6b3a;
+  --green-glow: #4ade80;
+  --amber: #f4a261;
+  --light: #f0f2f8;
+  --white: #ffffff;
+  --text: #1a1f36;
+  --text-mid: #5a6080;
+  --text-light: #8891b0;
+  --glass: rgba(255,255,255,0.06);
+  --glass2: rgba(255,255,255,0.1);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background: var(--dark); font-family: 'Noto Sans SC', sans-serif; }
+
+/* ── SLIDE CONTAINER ── */
+.slides-wrapper { width:100%; height:100%; position:relative; }
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.8s cubic-bezier(.4,0,.2,1);
+  padding: 3vh 5vw;
+  overflow: hidden;
+}
+.slide.active { opacity:1; pointer-events:auto; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeInLeft { from { opacity:0; transform:translateX(-50px); } to { opacity:1; transform:translateX(0); } }
+@keyframes fadeInRight { from { opacity:0; transform:translateX(50px); } to { opacity:1; transform:translateX(0); } }
+@keyframes fadeInScale { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+@keyframes slideInDown { from { opacity:0; transform:translateY(-30px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pulseGlow { 0%,100% { box-shadow: 0 0 20px rgba(232,82,63,0.3); } 50% { box-shadow: 0 0 40px rgba(232,82,63,0.6); } }
+@keyframes pulseGlowGreen { 0%,100% { box-shadow: 0 0 20px rgba(46,204,113,0.3); } 50% { box-shadow: 0 0 40px rgba(46,204,113,0.6); } }
+@keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-12px); } }
+@keyframes rotateIn { from { opacity:0; transform:rotate(-10deg) scale(0.8); } to { opacity:1; transform:rotate(0) scale(1); } }
+@keyframes typewriter { from { width:0; } to { width:100%; } }
+@keyframes blink { 0%,100% { border-right-color: var(--accent); } 50% { border-right-color: transparent; } }
+@keyframes drawLine { from { width:0; } to { width:100%; } }
+@keyframes countUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes ripple { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(3); opacity:0; } }
+@keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+@keyframes spinSlow { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+@keyframes bounceIn { 0% { opacity:0; transform:scale(0.3); } 50% { transform:scale(1.05); } 70% { transform:scale(0.95); } 100% { opacity:1; transform:scale(1); } }
+@keyframes slideUp { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
+@keyframes expandWidth { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+@keyframes gradientShift { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
+
+.slide.active .anim-up { animation: fadeInUp 0.7s ease both; }
+.slide.active .anim-left { animation: fadeInLeft 0.7s ease both; }
+.slide.active .anim-right { animation: fadeInRight 0.7s ease both; }
+.slide.active .anim-scale { animation: fadeInScale 0.6s ease both; }
+.slide.active .anim-down { animation: slideInDown 0.6s ease both; }
+.slide.active .anim-bounce { animation: bounceIn 0.8s ease both; }
+.slide.active .anim-rotate { animation: rotateIn 0.7s ease both; }
+
+/* delay classes */
+.d1 { animation-delay: 0.15s !important; } .d2 { animation-delay: 0.3s !important; }
+.d3 { animation-delay: 0.45s !important; } .d4 { animation-delay: 0.6s !important; }
+.d5 { animation-delay: 0.75s !important; } .d6 { animation-delay: 0.9s !important; }
+.d7 { animation-delay: 1.05s !important; } .d8 { animation-delay: 1.2s !important; }
+.d9 { animation-delay: 1.35s !important; } .d10 { animation-delay: 1.5s !important; }
+
+/* ── NAVIGATION ── */
+.nav-bar {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  display:flex; justify-content:center; align-items:center; gap:12px;
+  padding:14px 20px;
+  background: linear-gradient(180deg, transparent, rgba(15,23,41,0.95));
+}
+.nav-btn {
+  width:40px; height:40px; border-radius:50%; border:2px solid var(--glass2);
+  background:var(--glass); color:var(--white); font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition: all 0.3s; backdrop-filter:blur(10px);
+}
+.nav-btn:hover { background:var(--accent); border-color:var(--accent); transform:scale(1.1); }
+.slide-counter {
+  color:var(--text-light); font-size:13px; font-weight:500; min-width:60px; text-align:center;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.progress-bar { position:fixed; top:0; left:0; height:3px; background:var(--accent); z-index:101; transition: width 0.5s ease; }
+.dot-nav { display:flex; gap:6px; }
+.dot {
+  width:8px; height:8px; border-radius:50%; background:var(--glass2); cursor:pointer;
+  transition: all 0.3s;
+}
+.dot.active { background:var(--accent); transform:scale(1.3); }
+
+/* ── COMMON STYLES ── */
+.slide-title {
+  font-family: 'Noto Serif SC', serif; font-weight:900; font-size: clamp(2rem, 5vw, 3.2rem);
+  color:var(--white); margin-bottom:1rem; line-height:1.3;
+}
+.slide-subtitle {
+  font-size: clamp(1rem, 2vw, 1.3rem); color:var(--amber); font-weight:400; margin-bottom:2rem;
+}
+.accent-line {
+  height:4px; background:var(--accent); border-radius:2px; transform-origin:left;
+}
+.slide.active .accent-line { animation: expandWidth 0.8s ease both; }
+
+.card {
+  background: var(--glass); backdrop-filter:blur(12px); border:1px solid var(--glass2);
+  border-radius:16px; padding:1.5rem; transition:all 0.4s;
+}
+.card:hover { transform:translateY(-4px); border-color:var(--accent); box-shadow: 0 8px 30px rgba(232,82,63,0.15); }
+
+/* ── SLIDE 1: TITLE ── */
+.s1-bg {
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse at 30% 50%, #1a2a50 0%, var(--dark) 70%);
+}
+.s1-particles { position:absolute; inset:0; overflow:hidden; }
+.s1-particle {
+  position:absolute; width:4px; height:4px; border-radius:50%;
+  background:var(--accent); opacity:0.3;
+  animation: float 4s ease-in-out infinite;
+}
+.s1-big-letter {
+  font-family:'Noto Serif SC', serif; font-weight:900; font-size:clamp(10rem,25vw,20rem);
+  position:absolute; opacity:0.06; color:var(--white); user-select:none;
+}
+.slide.active .s1-x { animation: fadeInLeft 1.2s ease both; }
+.slide.active .s1-y { animation: fadeInRight 1.2s ease both 0.3s; }
+.s1-content { position:relative; z-index:2; text-align:center; }
+.s1-main-title {
+  font-family:'Noto Serif SC', serif; font-weight:900;
+  font-size:clamp(2.5rem,7vw,5rem); color:var(--white); line-height:1.2;
+}
+.s1-main-title .x-letter { color:var(--accent); display:inline-block; }
+.s1-main-title .y-letter { color:var(--green); display:inline-block; }
+.slide.active .s1-main-title .x-letter { animation: bounceIn 0.8s ease both 0.5s; }
+.slide.active .s1-main-title .y-letter { animation: bounceIn 0.8s ease both 0.7s; }
+.s1-divider { width:80px; height:4px; background:var(--accent); margin:1.5rem auto; border-radius:2px; }
+.slide.active .s1-divider { animation: expandWidth 1s ease both 1s; transform-origin:center; }
+.s1-author { color:var(--text-light); font-size:clamp(0.8rem,1.5vw,1rem); }
+
+/* ── SLIDE 2: WHAT IS X/Y ── */
+.s2-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; width:100%; max-width:1100px; }
+.s2-panel {
+  border-radius:20px; padding:2.5rem; position:relative; overflow:hidden;
+}
+.s2-panel.x-panel {
+  background: linear-gradient(135deg, #2a1a1a 0%, #1a1020 100%);
+  border:1px solid rgba(232,82,63,0.2);
+}
+.s2-panel.y-panel {
+  background: linear-gradient(135deg, #1a2a1a 0%, #102018 100%);
+  border:1px solid rgba(46,204,113,0.2);
+}
+.s2-icon {
+  width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:2rem; margin-bottom:1rem;
+}
+.s2-icon.x-icon { background:rgba(232,82,63,0.15); color:var(--accent); }
+.slide.active .s2-icon.x-icon { animation: pulseGlow 2s infinite 1s; }
+.s2-icon.y-icon { background:rgba(46,204,113,0.15); color:var(--green); }
+.slide.active .s2-icon.y-icon { animation: pulseGlowGreen 2s infinite 1s; }
+.s2-label { font-family:'Noto Serif SC', serif; font-weight:900; font-size:2rem; margin-bottom:0.5rem; }
+.s2-desc { color:var(--text-light); font-size:0.95rem; line-height:1.8; }
+.s2-items { list-style:none; margin-top:1rem; }
+.s2-items li {
+  padding:0.6rem 0; border-bottom:1px solid var(--glass2); color:var(--text-light);
+  font-size:0.9rem; display:flex; align-items:flex-start; gap:0.6rem;
+}
+.s2-items li::before { content:''; width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:0.5rem; }
+.x-panel .s2-items li::before { background:var(--accent); }
+.y-panel .s2-items li::before { background:var(--green); }
+
+/* ── SLIDE 3: COMPARISON ── */
+.s3-table { width:100%; max-width:1000px; border-collapse:separate; border-spacing:0 6px; }
+.s3-table th {
+  padding:0.8rem 1.2rem; font-size:0.95rem; font-weight:700; text-align:center;
+}
+.s3-table th:first-child { background:var(--mid); color:var(--white); border-radius:10px 0 0 10px; }
+.s3-table th:nth-child(2) { background:var(--accent); color:var(--white); }
+.s3-table th:nth-child(3) { background:var(--green-dark); color:var(--white); border-radius:0 10px 10px 0; }
+.s3-table td {
+  padding:0.75rem 1.2rem; text-align:center; font-size:0.9rem;
+  background: var(--glass); color:var(--text-light); backdrop-filter:blur(8px);
+}
+.s3-table td:first-child { font-weight:700; color:var(--white); border-radius:8px 0 0 8px; }
+.s3-table td:last-child { border-radius:0 8px 8px 0; }
+.s3-table tr { transition: transform 0.3s; }
+.s3-table tr:hover { transform:scale(1.02); }
+
+/* ── SLIDE 4-5: ANCIENT ── */
+.s4-cols { display:grid; grid-template-columns:1fr 1fr; gap:2rem; width:100%; max-width:1100px; }
+.s4-col { }
+.s4-col-title {
+  font-family:'Noto Serif SC', serif; font-weight:700; font-size:1.3rem;
+  margin-bottom:1rem; padding-bottom:0.5rem;
+  border-bottom:3px solid var(--accent);
+}
+.s4-col-title.green { border-bottom-color: var(--green); }
+.s4-item {
+  background:var(--glass); border-radius:12px; padding:1rem 1.2rem; margin-bottom:0.7rem;
+  border-left:4px solid var(--accent); transition:all 0.3s;
+}
+.s4-item.green { border-left-color:var(--green); }
+.s4-item:hover { transform:translateX(8px); background:var(--glass2); }
+.s4-item-title { font-weight:700; color:var(--white); font-size:0.95rem; margin-bottom:0.3rem; }
+.s4-item-desc { color:var(--text-light); font-size:0.82rem; line-height:1.5; }
+
+/* ── SLIDE 6: MILITARY TIMELINE ── */
+.s6-timeline { position:relative; width:100%; max-width:1000px; padding:1rem 0; }
+.s6-line {
+  position:absolute; top:50%; left:0; right:0; height:3px;
+  background: linear-gradient(90deg, var(--accent), var(--amber), var(--green));
+  transform:translateY(-50%);
+}
+.slide.active .s6-line { animation: expandWidth 1.5s ease both 0.3s; transform-origin:left; transform:translateY(-50%) scaleX(1); }
+.s6-nodes { display:flex; justify-content:space-between; position:relative; z-index:2; }
+.s6-node { text-align:center; flex:1; }
+.s6-dot {
+  width:36px; height:36px; border-radius:50%; margin:0 auto 0.5rem;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:0.75rem; color:var(--white);
+  position:relative;
+}
+.s6-dot.x-dot { background:var(--accent); }
+.s6-dot.y-dot { background:var(--green); }
+.s6-dot::after {
+  content:''; position:absolute; inset:-4px; border-radius:50%;
+  border:2px solid currentColor; opacity:0;
+}
+.slide.active .s6-dot::after { animation: ripple 2s ease infinite; }
+.s6-dot.x-dot::after { color:var(--accent); }
+.s6-dot.y-dot::after { color:var(--green); }
+.s6-label { font-weight:700; font-size:0.85rem; color:var(--white); }
+.s6-sublabel { font-size:0.75rem; color:var(--text-light); margin-top:0.2rem; }
+
+/* ── SLIDE 7: KMT vs CPC ── */
+.s7-vs { position:relative; display:flex; align-items:center; justify-content:center; gap:0; width:100%; max-width:1100px; }
+.s7-side {
+  flex:1; padding:2rem; border-radius:20px; min-height:400px;
+}
+.s7-side.kmt {
+  background: linear-gradient(135deg, #2a1515 0%, #1a1020 100%);
+  border:1px solid rgba(232,82,63,0.2); border-radius:20px 0 0 20px;
+}
+.s7-side.cpc {
+  background: linear-gradient(135deg, #152a15 0%, #102018 100%);
+  border:1px solid rgba(46,204,113,0.2); border-radius:0 20px 20px 0;
+}
+.s7-vs-badge {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:5;
+  width:60px; height:60px; border-radius:50%; background:var(--dark);
+  border:3px solid var(--amber); display:flex; align-items:center; justify-content:center;
+  font-weight:900; color:var(--amber); font-size:1rem;
+}
+.slide.active .s7-vs-badge { animation: bounceIn 0.8s ease both 0.5s; }
+.s7-title { font-family:'Noto Serif SC', serif; font-weight:700; font-size:1.2rem; margin-bottom:1rem; }
+.s7-item { display:flex; gap:0.6rem; margin-bottom:0.8rem; align-items:flex-start; }
+.s7-bullet { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:0.4rem; }
+.s7-item-text { font-size:0.85rem; line-height:1.6; }
+.s7-item-text strong { display:block; color:var(--white); font-size:0.9rem; }
+.s7-item-text span { color:var(--text-light); }
+
+/* ── SLIDE 8: TOYOTA ── */
+.s8-diagram { width:100%; max-width:1000px; position:relative; }
+.s8-outer {
+  border:2px solid rgba(232,82,63,0.3); border-radius:20px; padding:1.5rem;
+  background:rgba(232,82,63,0.04); position:relative;
+}
+.s8-outer-label {
+  position:absolute; top:-14px; left:20px; background:var(--dark); padding:0 12px;
+  color:var(--accent); font-weight:700; font-size:0.9rem;
+}
+.s8-x-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem; }
+.s8-x-card {
+  background:var(--glass); border-radius:12px; padding:1rem; text-align:center;
+  border-top:3px solid var(--accent);
+}
+.s8-x-card h4 { color:var(--accent); font-size:0.95rem; margin-bottom:0.4rem; }
+.s8-x-card p { color:var(--text-light); font-size:0.78rem; line-height:1.5; }
+.s8-arrow-row { text-align:center; font-size:1.5rem; color:var(--amber); margin:0.5rem 0; }
+.slide.active .s8-arrow-row { animation: float 2s ease-in-out infinite; }
+.s8-inner {
+  border:2px solid rgba(46,204,113,0.3); border-radius:16px; padding:1.5rem;
+  background:rgba(46,204,113,0.04); position:relative;
+}
+.s8-inner-label {
+  position:absolute; top:-14px; left:20px; background:var(--dark); padding:0 12px;
+  color:var(--green); font-weight:700; font-size:0.9rem;
+}
+.s8-y-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+.s8-y-card {
+  background:rgba(46,204,113,0.08); border-radius:12px; padding:1rem; text-align:center;
+  border-top:3px solid var(--green);
+}
+.s8-y-card h4 { color:var(--green); font-size:0.95rem; margin-bottom:0.4rem; }
+.s8-y-card p { color:var(--text-light); font-size:0.78rem; line-height:1.5; }
+
+/* ── SLIDE 9: MULTI-SECTOR ── */
+.s9-sectors { display:flex; flex-direction:column; gap:1rem; width:100%; max-width:1000px; }
+.s9-row {
+  display:grid; grid-template-columns: 140px 1fr 1fr; gap:0; border-radius:16px; overflow:hidden;
+  background:var(--glass); backdrop-filter:blur(8px);
+}
+.s9-label {
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Noto Serif SC', serif; font-weight:700; font-size:1.1rem; color:var(--white);
+  padding:1rem;
+}
+.s9-cell {
+  padding:0.8rem 1.2rem; border-left:1px solid var(--glass2);
+  display:flex; align-items:center; gap:0.6rem;
+}
+.s9-tag {
+  width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:0.75rem; color:var(--white); flex-shrink:0;
+}
+.s9-tag.x { background:var(--accent); }
+.s9-tag.y { background:var(--green); }
+.s9-cell-text { font-size:0.82rem; color:var(--text-light); line-height:1.5; }
+
+/* ── SLIDE 10: THREE VARIABLES ── */
+.s10-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; width:100%; max-width:1050px; }
+.s10-card {
+  background:var(--glass); backdrop-filter:blur(12px); border-radius:20px;
+  padding:2rem 1.5rem; text-align:center; border:1px solid var(--glass2);
+  transition:all 0.4s; position:relative; overflow:hidden;
+}
+.s10-card:hover { transform:translateY(-8px); }
+.s10-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:4px;
+}
+.s10-card:nth-child(1)::before { background:var(--accent); }
+.s10-card:nth-child(2)::before { background:var(--amber); }
+.s10-card:nth-child(3)::before { background:var(--green); }
+.s10-num {
+  font-family:'Noto Serif SC', serif; font-weight:900; font-size:3.5rem; line-height:1;
+  margin-bottom:0.5rem;
+}
+.s10-card:nth-child(1) .s10-num { color:var(--accent); }
+.s10-card:nth-child(2) .s10-num { color:var(--amber); }
+.s10-card:nth-child(3) .s10-num { color:var(--green); }
+.s10-card-title {
+  font-family:'Noto Serif SC', serif; font-weight:700; font-size:1.3rem;
+  color:var(--white); margin-bottom:1rem;
+}
+.s10-card-text { color:var(--text-light); font-size:0.82rem; line-height:1.8; text-align:left; }
+
+/* ── SLIDE 11: INSIGHTS ── */
+.s11-list { display:flex; flex-direction:column; gap:1.2rem; width:100%; max-width:900px; }
+.s11-item {
+  display:flex; gap:1.5rem; align-items:flex-start; background:var(--glass);
+  border-radius:16px; padding:1.5rem 2rem; border-left:4px solid var(--accent);
+  backdrop-filter:blur(12px); transition:all 0.4s;
+}
+.s11-item:hover { transform:translateX(8px); border-left-color:var(--amber); }
+.s11-icon {
+  width:50px; height:50px; border-radius:14px; background:rgba(232,82,63,0.12);
+  display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0;
+}
+.s11-text h3 { color:var(--white); font-size:1rem; margin-bottom:0.4rem; font-weight:700; }
+.s11-text p { color:var(--text-light); font-size:0.85rem; line-height:1.6; }
+
+/* ── SLIDE 12: FINAL ── */
+.s12-content { text-align:center; position:relative; z-index:2; }
+.s12-big-xy {
+  font-family:'Noto Serif SC', serif; font-weight:900; font-size:clamp(8rem,20vw,14rem);
+  line-height:1; margin-bottom:1rem; user-select:none;
+}
+.s12-big-xy .x-l { color:var(--accent); opacity:0.2; }
+.s12-big-xy .y-l { color:var(--green); opacity:0.2; }
+.s12-quote {
+  font-family:'Noto Serif SC', serif; font-weight:700;
+  font-size:clamp(1.2rem,3vw,2rem); color:var(--white); margin-bottom:1rem;
+}
+.s12-sub { color:var(--amber); font-size:clamp(0.9rem,1.8vw,1.2rem); }
+.s12-source { color:var(--text-light); font-size:0.8rem; margin-top:2rem; }
+.s12-glow-circle {
+  position:absolute; width:300px; height:300px; border-radius:50%; filter:blur(100px); opacity:0.15;
+}
+.s12-glow-circle.red { background:var(--accent); left:20%; top:30%; }
+.s12-glow-circle.grn { background:var(--green); right:20%; top:30%; }
+.slide.active .s12-glow-circle.red { animation: float 5s ease-in-out infinite; }
+.slide.active .s12-glow-circle.grn { animation: float 5s ease-in-out infinite 1.5s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width:768px) {
+  .s2-grid, .s4-cols, .s10-cards { grid-template-columns:1fr; }
+  .s7-vs { flex-direction:column; }
+  .s7-side.kmt { border-radius:20px 20px 0 0; }
+  .s7-side.cpc { border-radius:0 0 20px 20px; }
+  .s7-vs-badge { top:auto; bottom:calc(50% - 30px); }
+  .s8-x-row, .s8-y-row { grid-template-columns:1fr; }
+  .s9-row { grid-template-columns:1fr; }
+  .s6-nodes { flex-wrap:wrap; gap:1rem; justify-content:center; }
+  .s6-line { display:none; }
+  .slide { padding:2vh 4vw; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="slides-wrapper" id="slidesWrapper">
+
+<!-- ═══ SLIDE 1: TITLE ═══ -->
+<div class="slide active" data-slide="0">
+  <div class="s1-bg"></div>
+  <div class="s1-particles" id="particles"></div>
+  <div class="s1-big-letter s1-x" style="left:5%;top:10%;">X</div>
+  <div class="s1-big-letter s1-y" style="right:5%;bottom:10%;">Y</div>
+  <div class="s1-content">
+    <div class="s1-main-title anim-up">
+      <span class="x-letter">X</span>理论与<span class="y-letter">Y</span>理论
+    </div>
+    <p class="slide-subtitle anim-up d2">在各领域的典型应用</p>
+    <div class="s1-divider"></div>
+    <p class="s1-author anim-up d4">Douglas McGregor · 《企业的人性面》 · 1960</p>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 2: X vs Y INTRO ═══ -->
+<div class="slide" data-slide="1">
+  <div class="slide-title anim-down" style="text-align:center;">两种人性假设</div>
+  <div class="accent-line d1" style="width:80px;margin:0 auto 2rem;"></div>
+  <div class="s2-grid">
+    <div class="s2-panel x-panel anim-left d2">
+      <div class="s2-icon x-icon">🔒</div>
+      <div class="s2-label" style="color:var(--accent);">X理论</div>
+      <p class="s2-desc">人性悲观假设 — 外部驱动逻辑</p>
+      <ul class="s2-items">
+        <li class="anim-left d3">人天生厌恶工作，必须被强迫</li>
+        <li class="anim-left d4">宁愿被领导，逃避责任</li>
+        <li class="anim-left d5">缺乏进取心，首要目标是安全</li>
+        <li class="anim-left d6">需要监控、惩罚和奖赏驱动</li>
+      </ul>
+    </div>
+    <div class="s2-panel y-panel anim-right d2">
+      <div class="s2-icon y-icon">🔓</div>
+      <div class="s2-label" style="color:var(--green);">Y理论</div>
+      <p class="s2-desc">人性乐观假设 — 内在激励逻辑</p>
+      <ul class="s2-items">
+        <li class="anim-right d3">工作如游戏般自然，可以是满足感来源</li>
+        <li class="anim-right d4">认同目标后可以自我引导和控制</li>
+        <li class="anim-right d5">适当条件下主动寻求责任</li>
+        <li class="anim-right d6">创造力广泛分布，潜能待释放</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 3: COMPARISON TABLE ═══ -->
+<div class="slide" data-slide="2">
+  <div class="slide-title anim-down" style="text-align:center;">核心对比</div>
+  <div class="accent-line d1" style="width:80px;margin:0 auto 2rem;"></div>
+  <table class="s3-table">
+    <tr class="anim-down d1"><th>维度</th><th>X理论</th><th>Y理论</th></tr>
+    <tr class="anim-up d2"><td>工作动机</td><td>外部奖惩驱动</td><td>内在成就感驱动</td></tr>
+    <tr class="anim-up d3"><td>责任感</td><td>外部压力迫使承担</td><td>适当条件下主动寻求</td></tr>
+    <tr class="anim-up d4"><td>决策方式</td><td>集中决策，员工执行</td><td>分散决策，信任判断</td></tr>
+    <tr class="anim-up d5"><td>错误处理</td><td>追究个人，惩罚</td><td>分析系统，改进</td></tr>
+    <tr class="anim-up d6"><td>沟通方式</td><td>单向命令</td><td>双向解释</td></tr>
+    <tr class="anim-up d7"><td>激励类比</td><td>推力 — 从背后推</td><td>引力 — 前方目标拉</td></tr>
+  </table>
+</div>
+
+<!-- ═══ SLIDE 4: ANCIENT CHINA ═══ -->
+<div class="slide" data-slide="3">
+  <div class="slide-title anim-down" style="text-align:center;">古代中国的应用</div>
+  <div class="accent-line d1" style="width:80px;margin:0 auto 1.5rem;"></div>
+  <div class="s4-cols">
+    <div class="s4-col">
+      <div class="s4-col-title anim-left d1" style="color:var(--accent);">X理论 · 法家</div>
+      <div class="s4-item anim-left d2"><div class="s4-item-title">连坐法</div><div class="s4-item-desc">一人犯罪邻里同罚，每个人变成监督者</div></div>
+      <div class="s4-item anim-left d3"><div class="s4-item-title">军功爵制</div><div class="s4-item-desc">斩首计功，从农民到封侯的清晰上升通道</div></div>
+      <div class="s4-item anim-left d4"><div class="s4-item-title">严刑峻法</div><div class="s4-item-desc">轻罪重罚、以刑去刑的恐惧威慑</div></div>
+      <div class="s4-item anim-left d5" style="border-left-color:var(--amber);"><div class="s4-item-title" style="color:var(--amber);">结局</div><div class="s4-item-desc">秦朝二世而亡 — 纯X理论的脆弱性</div></div>
+    </div>
+    <div class="s4-col">
+      <div class="s4-col-title green anim-right d1" style="color:var(--green);">Y理论 · 道家/儒家</div>
+      <div class="s4-item green anim-right d2"><div class="s4-item-title">无为而治</div><div class="s4-item-desc">"我无为而民自化" — 管理者退后，民众自觉</div></div>
+      <div class="s4-item green anim-right d3"><div class="s4-item-title">文景之治</div><div class="s4-item-desc">减税轻徭、不折腾，国库自然充盈</div></div>
+      <div class="s4-item green anim-right d4"><div class="s4-item-title">贞观之治</div><div class="s4-item-desc">鼓励直言进谏，臣子是思考者而非工具</div></div>
+      <div class="s4-item green anim-right d5"><div class="s4-item-title">德治教化</div><div class="s4-item-desc">以德行感召，"上下同欲者胜"</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 5: ANCIENT WEST ═══ -->
+<div class="slide" data-slide="4">
+  <div class="slide-title anim-down" style="text-align:center;">古代西方的应用</div>
+  <div class="accent-line d1" style="width:80px;margin:0 auto 1.5rem;"></div>
+  <div class="s4-cols">
+    <div class="s4-col">
+      <div class="s4-col-title anim-left d1" style="color:var(--accent);">X理论典型</div>
+      <div class="s4-item anim-left d2"><div class="s4-item-title">斯巴达</div><div class="s4-item-desc">男孩7岁离家军训，极端纪律消灭个人意志</div></div>
+      <div class="s4-item anim-left d3"><div class="s4-item-title">罗马军团</div><div class="s4-item-desc">十一抽杀+勋章体系，梯度精密的赏罚设计</div></div>
+      <div class="s4-item anim-left d4"><div class="s4-item-title">中世纪教会</div><div class="s4-item-desc">地狱恐惧+天堂许诺，赎罪券量化灵魂激励</div></div>
+    </div>
+    <div class="s4-col">
+      <div class="s4-col-title green anim-right d1" style="color:var(--green);">Y理论典型</div>
+      <div class="s4-item green anim-right d2"><div class="s4-item-title">雅典民主</div><div class="s4-item-desc">公民大会直接参政，抽签制信任普通人的能力</div></div>
+      <div class="s4-item green anim-right d3"><div class="s4-item-title">罗马共和</div><div class="s4-item-desc">荣誉晋升无薪酬，辛辛纳图斯的自觉责任感</div></div>
+      <div class="s4-item green anim-right d4"><div class="s4-item-title">本笃修道院</div><div class="s4-item-desc">自愿承诺与祈祷劳作，院长是牧者而非监工</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 6: MILITARY TIMELINE ═══ -->
+<div class="slide" data-slide="5">
+  <div class="slide-title anim-down" style="text-align:center;font-size:clamp(1.5rem,3.5vw,2.2rem);">军事领域：从机械服从到任务式指挥</div>
+  <div class="accent-line d1" style="width:80px;margin:0 auto 2rem;"></div>
+  <div class="s6-timeline">
+    <div class="s6-line"></div>
+    <div class="s6-nodes">
+      <div class="s6-node anim-up d2">
+        <div class="s6-dot x-dot">X</div>
+        <div class="s6-label">亚述帝国</div>
+        <div class="s6-sublabel">恐惧系统化</div>
+      </div>
+      <div class="s6-node anim-up d3">
+        <div class="s6-dot x-dot">X</div>
+        <div class="s6-label">罗马军团</div>
+        <div class="s6-sublabel">精密赏罚</div>
+      </div>
+      <div class="s6-node anim-up d4">
+        <div class="s6-dot x-dot">X</div>
+        <div class="s6-label">腓特烈大帝</div>
+        <div class="s6-sublabel">机械纪律巅峰</div>
+      </div>
+      <div class="s6-node anim-up d5">
+        <div class="s6-dot y-dot">Y</div>
+        <div class="s6-label">拿破仑</div>
+        <div class="s6-sublabel">信念驱动</div>
+      </div>
+      <div class="s6-node anim-up d6">
+        <div class="s6-dot y-dot">Y</div>
+        <div class="s6-label">任务式指挥</div>
+        <div class="s6-sublabel">制度化自主决策</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;width:100%;max-width:1000px;margin-top:2rem;">
+    <div class="card anim-left d7" style="border-left:4px solid var(--accent);">
+      <h4 style="color:var(--accent);font-size:0.95rem;margin-bottom:0.6rem;">关键教训</h4>
+      <p style="color:var(--text-light);font-size:0.8rem;line-height:1.7;">索姆河：X理论集中指挥致一天57,000伤亡<br>斯大林格勒：希特勒X理论干预致30万人覆灭<br><strong style="color:var(--amber);">同一支德军 — Y理论辉煌，X理论惨败</strong></p>
+    </div>
+    <div class="card anim-right d7" style="border-left:4px solid var(--green);">
+      <h4 style="color:var(--green);font-size:0.95rem;margin-bottom:0.6rem;">现代演变</h4>
+      <p style="color:var(--text-light);font-size:0.8rem;line-height:1.7;">以色列IDF：Rosh Gadol主动思考文化<br>特种部队：选拔用X，日常管理用Y的极致<br><strong style="color:var(--amber);">X理论建基础，Y理论释放上限</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 7: KMT vs CPC ═══ -->
+<div class="slide" data-slide="6">
+  <div class="slide-title anim-down" style="text-align:center;font-size:clamp(1.4rem,3vw,2rem);">国共两军：同一批人，不同的管理，不同的结局</div>
+  <div class="accent-line d1" style="width:80px;margin:0 auto 1.5rem;"></div>
+  <div class="s7-vs">
+    <div class="s7-side kmt anim-left d2">
+      <div class="s7-title" style="color:var(--accent);">国民党军队 — X理论</div>
+      <div class="s7-item"><div class="s7-bullet" style="background:var(--accent);"></div><div class="s7-item-text"><strong>抓壮丁强制征兵</strong><span>从第一刻起无心理契约</span></div></div>
+      <div class="s7-item"><div class="s7-bullet" style="background:var(--accent);"></div><div class="s7-item-text"><strong>系统性克扣军饷</strong><span>最基本的胡萝卜被抽走</span></div></div>
+      <div class="s7-item"><div class="s7-bullet" style="background:var(--accent);"></div><div class="s7-item-text"><strong>随意体罚·特务监控</strong><span>不可预测的惩罚更具破坏性</span></div></div>
+      <div class="s7-item"><div class="s7-bullet" style="background:var(--accent);"></div><div class="s7-item-text"><strong>派系分而治之</strong><span>将领首要考虑是自保而非全局</span></div></div>
+      <div class="s7-item"><div class="s7-bullet" style="background:var(--amber);"></div><div class="s7-item-text"><strong style="color:var(--amber);">→ 友军见死不救，大规模溃逃</strong></div></div>
+    </div>
+    <div class="s7-vs-badge">VS</div>
+    <div class="s7-side cpc anim-right d2">
+      <div class="s7-title" style="color:var(--green);">共产党军队 — Y理论</div>
+      <div class="s7-item"><div class="s7-bullet" style="background:var(--green);"></div><div class="s7-item-text"><strong>支部建在连上</strong><span>士兵从被管理对象变为参与者</span></div></div>
+      <div class="s7-item"><div class="s7-bullet" style="background:var(--green);"></div><div class="s7-item-text"><strong>官兵平等·废除肉刑</strong><span>消除等级差异，建立信任</span></div></div>
+      <div class="s7-item"><div class="s7-bullet" style="background:var(--green);"></div><div class="s7-item-text"><strong>诉苦运动·立功运动</strong><span>外在动机→内在动机的系统转化</span></div></div>
+      <div class="s7-item"><div class="s7-bullet" style="background:var(--green);"></div><div class="s7-item-text"><strong>优待俘虏·即俘即补</strong><span>Y理论的跨组织瓦解与转化</span></div></div>
+      <div class="s7-item"><div class="s7-bullet" style="background:var(--amber);"></div><div class="s7-item-text"><strong style="color:var(--amber);">→ 塔山死守，孟良崮主动协同</strong></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 8: TOYOTA ═══ -->
+<div class="slide" data-slide="7">
+  <div class="slide-title anim-down" style="text-align:center;">丰田模式：X与Y的精妙融合</div>
+  <div class="accent-line d1" style="width:80px;margin:0 auto 1.5rem;"></div>
+  <div class="s8-diagram">
+    <div class="s8-outer anim-scale d2">
+      <div class="s8-outer-label">X理论工具层 · 问题暴露系统</div>
+      <div class="s8-x-row">
+        <div class="s8-x-card anim-up d3"><h4>标准化作业</h4><p>精确到秒的流程规定<br>让偏差无处藏身</p></div>
+        <div class="s8-x-card anim-up d4"><h4>准时化 (JIT)</h4><p>零库存暴露问题<br>降低水位看见石头</p></div>
+        <div class="s8-x-card anim-up d5"><h4>可视化管理</h4><p>所有状态透明可见<br>柔性的同伴监督</p></div>
+      </div>
+      <div class="s8-arrow-row anim-scale d6">▼ 暴露问题 ▼</div>
+      <div class="s8-inner anim-scale d7">
+        <div class="s8-inner-label">Y理论信念层 · 问题解决系统</div>
+        <div class="s8-y-row">
+          <div class="s8-y-card anim-up d8"><h4>安灯系统</h4><p>任何工人可拉绳停线<br>信任一线判断力</p></div>
+          <div class="s8-y-card anim-up d9"><h4>改善提案</h4><p>百万级提案，象征性奖金<br>内在动机驱动</p></div>
+          <div class="s8-y-card anim-up d10"><h4>苏格拉底提问</h4><p>不给答案只提问题<br>培养独立思考</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 9: EDUCATION/TECH/MEDICAL ═══ -->
+<div class="slide" data-slide="8">
+  <div class="slide-title anim-down" style="text-align:center;">教育 · 科技 · 医疗</div>
+  <div class="accent-line d1" style="width:80px;margin:0 auto 1.5rem;"></div>
+  <div class="s9-sectors">
+    <div class="s9-row anim-up d2">
+      <div class="s9-label" style="background:rgba(108,92,231,0.3);">教育</div>
+      <div class="s9-cell"><div class="s9-tag x">X</div><div class="s9-cell-text">普鲁士应试模式：外部奖惩驱动，短期有效但扼杀求知欲</div></div>
+      <div class="s9-cell"><div class="s9-tag y">Y</div><div class="s9-cell-text">芬兰/蒙特梭利：自主学习、极少考试，PISA名列前茅</div></div>
+    </div>
+    <div class="s9-row anim-up d4">
+      <div class="s9-label" style="background:rgba(9,132,227,0.3);">科技</div>
+      <div class="s9-cell"><div class="s9-tag x">X</div><div class="s9-cell-text">亚马逊仓库：算法监控每个动作，数字时代的泰勒制复活</div></div>
+      <div class="s9-cell"><div class="s9-tag y">Y</div><div class="s9-cell-text">Netflix：无限休假、信息透明，以高门槛选人为前提</div></div>
+    </div>
+    <div class="s9-row anim-up d6">
+      <div class="s9-label" style="background:rgba(0,184,148,0.3);">医疗</div>
+      <div class="s9-cell"><div class="s9-tag x">X</div><div class="s9-cell-text">手术清单：强制核对流程，错误代价极高时X理论不可替代</div></div>
+      <div class="s9-cell"><div class="s9-tag y">Y</div><div class="s9-cell-text">非惩罚性报告：安全环境让差错暴露，系统持续改进</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 10: THREE VARIABLES ═══ -->
+<div class="slide" data-slide="9">
+  <div class="slide-title anim-down" style="text-align:center;">三个关键变量决定X-Y配比</div>
+  <div class="accent-line d1" style="width:80px;margin:0 auto 2rem;"></div>
+  <div class="s10-cards">
+    <div class="s10-card anim-up d2">
+      <div class="s10-num">01</div>
+      <div class="s10-card-title">错误代价</div>
+      <div class="s10-card-text">代价高且不可逆 → X理论刚性约束必需<br><br>代价可控可学习 → Y理论容错空间更优</div>
+    </div>
+    <div class="s10-card anim-up d4">
+      <div class="s10-num">02</div>
+      <div class="s10-card-title">可标准化程度</div>
+      <div class="s10-card-text">高度可标准化 → X理论精确控制最高效<br><br>需要创造性判断 → Y理论自主空间释放潜能</div>
+    </div>
+    <div class="s10-card anim-up d6">
+      <div class="s10-num">03</div>
+      <div class="s10-card-title">时间尺度</div>
+      <div class="s10-card-text">X理论短期见效快，但长期维持成本递增<br><br>Y理论短期见效慢，但一旦建立更持久自强化</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 11: INSIGHTS ═══ -->
+<div class="slide" data-slide="10">
+  <div class="slide-title anim-down" style="text-align:center;">终极启示</div>
+  <div class="accent-line d1" style="width:80px;margin:0 auto 2rem;"></div>
+  <div class="s11-list">
+    <div class="s11-item anim-left d2">
+      <div class="s11-icon">⚙️</div>
+      <div class="s11-text">
+        <h3>工具是中性的，使用意图决定它是锁链还是阶梯</h3>
+        <p>同样是"标准化"，泰勒制下是压制，丰田模式下是赋能</p>
+      </div>
+    </div>
+    <div class="s11-item anim-left d4">
+      <div class="s11-icon">💡</div>
+      <div class="s11-text">
+        <h3>X理论让人"完成任务"，Y理论让人"超越期望"</h3>
+        <p>X能维持"不逃跑"的底线，Y能激发"主动牺牲"的上限</p>
+      </div>
+    </div>
+    <div class="s11-item anim-left d6">
+      <div class="s11-icon">🔓</div>
+      <div class="s11-text">
+        <h3>Y理论的能力是肌肉，不是开关</h3>
+        <p>平时不培养自主判断力，危机时想授权也来不及</p>
+      </div>
+    </div>
+    <div class="s11-item anim-left d8" style="border-left-color:var(--amber);background:rgba(244,162,97,0.06);">
+      <div class="s11-icon">❤️</div>
+      <div class="s11-text">
+        <h3>一个组织如何对待其最底层的成员，决定了最严峻考验中的生死</h3>
+        <p>你如何投资于人，人就如何回报于你</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 12: FINAL ═══ -->
+<div class="slide" data-slide="11">
+  <div class="s12-glow-circle red"></div>
+  <div class="s12-glow-circle grn"></div>
+  <div class="s12-content">
+    <div class="s12-big-xy anim-scale">
+      <span class="x-l">X</span> <span class="y-l">Y</span>
+    </div>
+    <div class="s12-quote anim-up d3">用纪律守住底线，用信任释放上限</div>
+    <div class="accent-line d5" style="width:60px;margin:1rem auto;"></div>
+    <div class="s12-sub anim-up d6">感谢聆听</div>
+    <div class="s12-source anim-up d8">基于 Douglas McGregor《The Human Side of Enterprise》(1960)</div>
+  </div>
+</div>
+
+</div><!-- slides-wrapper -->
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">◀</button>
+  <div class="dot-nav" id="dotNav"></div>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">▶</button>
+</div>
+
+<script>
+// Particles
+const particlesEl = document.getElementById('particles');
+for(let i=0; i<30; i++){
+  const p = document.createElement('div');
+  p.className = 's1-particle';
+  p.style.left = Math.random()*100+'%';
+  p.style.top = Math.random()*100+'%';
+  p.style.width = p.style.height = (2+Math.random()*4)+'px';
+  p.style.animationDelay = Math.random()*4+'s';
+  p.style.animationDuration = (3+Math.random()*4)+'s';
+  p.style.opacity = 0.1+Math.random()*0.3;
+  particlesEl.appendChild(p);
+}
+
+// Slide navigation
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+const progress = document.getElementById('progressBar');
+const dotNav = document.getElementById('dotNav');
+
+// Create dots
+for(let i=0; i<total; i++){
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i===0?' active':'');
+  dot.onclick = () => goToSlide(i);
+  dotNav.appendChild(dot);
+}
+
+function updateSlide(){
+  slides.forEach((s,i) => s.classList.toggle('active', i===current));
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===current));
+  progress.style.width = ((current+1)/total*100)+'%';
+}
+
+function changeSlide(dir){
+  current = Math.max(0, Math.min(total-1, current+dir));
+  updateSlide();
+}
+
+function goToSlide(i){
+  current = i;
+  updateSlide();
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter') { e.preventDefault(); changeSlide(1); }
+  if(e.key==='ArrowLeft'||e.key==='Backspace') { e.preventDefault(); changeSlide(-1); }
+  if(e.key==='Home') { e.preventDefault(); goToSlide(0); }
+  if(e.key==='End') { e.preventDefault(); goToSlide(total-1); }
+});
+
+// Touch / swipe
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if(Math.abs(diff)>50){ diff>0 ? changeSlide(1) : changeSlide(-1); }
+});
+
+// Mouse wheel
+let wheelTimeout;
+document.addEventListener('wheel', e => {
+  if(wheelTimeout) return;
+  wheelTimeout = setTimeout(()=>{ wheelTimeout=null; }, 600);
+  e.deltaY>0 ? changeSlide(1) : changeSlide(-1);
+}, {passive:true});
+</script>
+</body>
+</html>
