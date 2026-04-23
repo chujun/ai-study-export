@@ -1,0 +1,26 @@
+# Claude Code 本地工作目录
+.claude/
+
+# Python 字节码
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python 虚拟环境
+venv/
+env/
+.venv/
+
+# IDE 配置（项目级别）
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.temp
